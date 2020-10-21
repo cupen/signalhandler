@@ -16,7 +16,7 @@ func assertString(t *testing.T, expected, actual string) {
 
 func TestWatch(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 	})
 	go Run(func(sig os.Signal) {
@@ -32,13 +32,13 @@ func TestWatch(t *testing.T) {
 
 func TestWatch_MultiHandlers(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 	})
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit2"
 	})
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit3"
 	})
 	go Run(func(sig os.Signal) {
@@ -56,15 +56,15 @@ func TestWatch_MultiHandlers(t *testing.T) {
 
 func TestWatch_Panic(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 		panic(fmt.Errorf("panic"))
 	})
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit2"
 		panic(fmt.Errorf("panic2"))
 	})
-	Watch(syscall.SIGHUP, func() {
+	Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit3"
 		panic(fmt.Errorf("panic3"))
 	})

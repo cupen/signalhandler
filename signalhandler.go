@@ -11,9 +11,11 @@ var (
 	sigQueue = make(chan os.Signal)
 )
 
-type Handler func()
-type DefaultHandler func(sig os.Signal)
+// Handler for `os/signal`
+type Handler func(sig os.Signal)
 
+// Watch `os/signal`, which meaning handler will be triggered by `os/signal`.
+// You can watch `os/signal` with multiple handlers, they will be ordering by first-watch-first-trigger.
 func Watch(sig os.Signal, h Handler) {
 	handlers, ok := hub[sig]
 	if !ok {
@@ -23,11 +25,13 @@ func Watch(sig os.Signal, h Handler) {
 	hub[sig] = append(handlers, h)
 }
 
+// Touch will trigger `os/signal` manually.
 func Touch(sig os.Signal) {
 	sigQueue <- sig
 }
 
-func Run(defaultHandler ...DefaultHandler) {
+// Run in current goroutine. It will causes blocking.
+func Run(defaultHandler ...Handler) {
 	for sig := range sigQueue {
 		handlers, ok := hub[sig]
 		if !ok || len(handlers) <= 0 {
@@ -43,12 +47,13 @@ func Run(defaultHandler ...DefaultHandler) {
 						log.Printf("panic recovered. err=%#v", r)
 					}
 				}()
-				h()
+				h(sig)
 			}()
 		}
 	}
 }
 
-func Start(defaultHandler ...DefaultHandler) {
+// Start is similar as Run, but it's in a new goroutine.
+func Start(defaultHandler ...Handler) {
 	go Run(defaultHandler...)
 }
