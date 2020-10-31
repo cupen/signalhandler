@@ -10,6 +10,7 @@ import (
 
 func assertString(t *testing.T, expected, actual string) {
 	if expected != actual {
+		t.Logf("\"%s\" != \"%s\"", expected, actual)
 		t.FailNow()
 	}
 }
@@ -80,4 +81,10 @@ func TestWatch_Panic(t *testing.T) {
 	assertString(t, "hit2", <-countor)
 	assertString(t, "hit3", <-countor)
 	time.Sleep(time.Millisecond)
+}
+
+func yes() {}
+func Test_getFuncName(t *testing.T) {
+	// yes := func() {}
+	assertString(t, "yes", getFuncName(yes))
 }
