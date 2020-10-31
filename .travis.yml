@@ -1,4 +1,9 @@
 language: go
+
+os:
+  - linux
+  - windows
+
 go:
   - 1.14.x
   - 1.15.x
@@ -7,10 +12,10 @@ before_install:
     - go get -t -v ./...
 
 install:
-    - go get github.com/cupen/signalhandler
+    - go get github.com/cupen/signalhub
 
 script:
-    - go test -coverprofile=coverage.txt -v -bench .
+    - go test -coverprofile coverage.txt -v -bench .
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

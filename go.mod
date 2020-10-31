@@ -1,4 +1,4 @@
-module github.com/cupen/signalhandler
+module github.com/cupen/signalhub
 
 go 1.14
 

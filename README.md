@@ -3,16 +3,16 @@
 ![Go Report][status]
 [![Coverage][cover]][cover-to]
 
-[status]: https://goreportcard.com/badge/github.com/cupen/signalhandler?style=flat-square
-[doc]:    https://godoc.org/github.com/cupen/signalhandler?status.svg
-[doc-to]: https://pkg.go.dev/github.com/cupen/signalhandler
+[status]: https://goreportcard.com/badge/github.com/cupen/signalhub?style=flat-square
+[doc]:    https://godoc.org/github.com/cupen/signalhub?status.svg
+[doc-to]: https://pkg.go.dev/github.com/cupen/signalhub
 [license]:  https://img.shields.io/badge/license-WTFPL-blue.svg
 [license-to]: LICENSE
-[cover]:    https://codecov.io/gh/cupen/signalhandler/branch/master/graph/badge.svg?token=HQODXQHLK3
-[cover-to]: https://codecov.io/gh/cupen/signalhandler
+[cover]:    https://codecov.io/gh/cupen/signalhub/branch/master/graph/badge.svg?token=HQODXQHLK3
+[cover-to]: https://codecov.io/gh/cupen/signalhub
 
 # Introduction
-A easy way to hanlde `os/signals`. See https://gobyexample.com/signals
+Hanlde `os/signals` with function style. See https://gobyexample.com/signals
 
 # Usage
 
@@ -23,25 +23,25 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cupen/signalhandler"
+	"github.com/cupen/signalhub"
 )
 
 func main() {
-	exitGracefully := func(sig os.Signal) {
+	exitHook := func(sig os.Signal) {
 		// do something before process exit
 		countDown(10)
 		log.Printf("exited by os/signal(%v)", sig)
 		os.Exit(0)
 	}
-
-	signalhandler.Watch(syscall.SIGQUIT, exitGracefully)
-	signalhandler.Watch(syscall.SIGTERM, exitGracefully)
-	signalhandler.Watch(syscall.SIGINT, func(sig os.Signal) {
-		exitGracefully(sig)
+	hub := signalhub.New()
+	hub.Watch(syscall.SIGQUIT, exitHook)
+	hub.Watch(syscall.SIGTERM, exitHook)
+	hub.Watch(syscall.SIGINT, func(sig os.Signal) {
+		exitHook(sig)
 	})
 
 	log.Printf("started. CTRL-C or kill -INT ${pid}")
-	signalhandler.Run()
+	h.Run()
 }
 
 func countDown(secs int) {

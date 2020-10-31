@@ -1,4 +1,4 @@
-package signalhandler
+package signalhub
 
 import (
 	"fmt"
@@ -16,39 +16,41 @@ func assertString(t *testing.T, expected, actual string) {
 
 func TestWatch(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub := New()
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 	})
-	go Run(func(sig os.Signal) {
+	go hub.Run(func(sig os.Signal) {
 		t.Logf("default handler. signal = %v", sig)
 		countor <- "miss"
 	})
-	Touch(syscall.SIGTERM)
+	hub.Touch(syscall.SIGTERM)
 	assertString(t, "miss", <-countor)
 
-	Touch(syscall.SIGHUP)
+	hub.Touch(syscall.SIGHUP)
 	assertString(t, "hit", <-countor)
 }
 
 func TestWatch_MultiHandlers(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub := New()
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 	})
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit2"
 	})
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit3"
 	})
-	go Run(func(sig os.Signal) {
+	go hub.Run(func(sig os.Signal) {
 		t.Logf("default handler. signal = %v", sig)
 		countor <- "miss"
 	})
-	Touch(syscall.SIGTERM)
+	hub.Touch(syscall.SIGTERM)
 	assertString(t, "miss", <-countor)
 
-	Touch(syscall.SIGHUP)
+	hub.Touch(syscall.SIGHUP)
 	assertString(t, "hit", <-countor)
 	assertString(t, "hit2", <-countor)
 	assertString(t, "hit3", <-countor)
@@ -56,23 +58,24 @@ func TestWatch_MultiHandlers(t *testing.T) {
 
 func TestWatch_Panic(t *testing.T) {
 	var countor = make(chan string)
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub := New()
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit"
 		panic(fmt.Errorf("panic"))
 	})
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit2"
 		panic(fmt.Errorf("panic2"))
 	})
-	Watch(syscall.SIGHUP, func(sig os.Signal) {
+	hub.Watch(syscall.SIGHUP, func(sig os.Signal) {
 		countor <- "hit3"
 		panic(fmt.Errorf("panic3"))
 	})
-	go Run(func(sig os.Signal) {
+	go hub.Run(func(sig os.Signal) {
 		t.Logf("default handler. signal = %v", sig)
 		countor <- "miss"
 	})
-	Touch(syscall.SIGHUP)
+	hub.Touch(syscall.SIGHUP)
 	assertString(t, "hit", <-countor)
 	assertString(t, "hit2", <-countor)
 	assertString(t, "hit3", <-countor)
