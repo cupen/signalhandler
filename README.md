@@ -33,10 +33,10 @@ func main() {
 		log.Printf("exited by os/signal(%v)", sig)
 		os.Exit(0)
 	}
-	hub := signalhub.New()
-	hub.Watch(syscall.SIGQUIT, exitHook)
-	hub.Watch(syscall.SIGTERM, exitHook)
-	hub.Watch(syscall.SIGINT, func(sig os.Signal) {
+	h := signalhub.New()
+	h.Watch(syscall.SIGQUIT, exitHook)
+	h.Watch(syscall.SIGTERM, exitHook)
+	h.Watch(syscall.SIGINT, func(sig os.Signal) {
 		exitHook(sig)
 	})
 
