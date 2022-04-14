@@ -12,7 +12,10 @@
 [cover-to]: https://codecov.io/gh/cupen/signalhub
 
 # Introduction
-Hanlde `os/signals` with function style. See https://gobyexample.com/signals
+Hanlde `os/signals` with function style. 
+See:
+* https://en.cppreference.com/w/cpp/utility/program/signal
+* https://gobyexample.com/signals
 
 # Usage
 
@@ -58,7 +61,7 @@ func countDown(secs int) {
         DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
                     Version 2, December 2004 
 
- Copyright (C) 2020 cupen <xcupen@gmail.com> 
+ Copyright (C) 2020-2022 cupen <xcupen@gmail.com> 
 
  Everyone is permitted to copy and distribute verbatim or modified 
  copies of this license document, and changing it is allowed as long 

@@ -10,9 +10,9 @@ import (
 )
 
 // Handler for `os/signal`
-type Handler func(sig os.Signal)
+type Handler func(os.Signal)
 
-// Hub is a group of handlers.
+// Hub is a group of signal handlers.
 type SignalHub struct {
 	handlers map[os.Signal][]Handler
 	queue    chan os.Signal
@@ -60,11 +60,12 @@ func (h *SignalHub) Run(defaultHandler ...Handler) {
 	}
 }
 
-// Start is similar as Run, it's nun on a new goroutine.
+// Start is similar as Run, but it's running asynchronously in separate goroutine.
 func (h *SignalHub) Start(defaultHandler ...Handler) {
 	go h.Run(defaultHandler...)
 }
 
+// Stop all
 func (h *SignalHub) Stop() {
 	close(h.queue)
 }
