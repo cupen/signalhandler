@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
+
+	"github.com/cupen/signalhub/signaldefs"
 )
 
 // Handler for `os/signal`
@@ -30,6 +32,11 @@ func New() *SignalHub {
 // You can watch `os/signal` with multiple handlers, they will triggerred with
 // ordering by first-watch-first-trigger.
 func (h *SignalHub) Watch(sig os.Signal, handler Handler) {
+	if sig == signaldefs.SIG_NONE {
+		log.Printf("[warn] invalid signal: %s, skipped it", sig)
+		return
+	}
+
 	handlers, ok := h.handlers[sig]
 	if !ok {
 		signal.Notify(h.queue, sig)
@@ -38,8 +45,19 @@ func (h *SignalHub) Watch(sig os.Signal, handler Handler) {
 	h.handlers[sig] = append(handlers, handler)
 }
 
+func (h *SignalHub) Unwatch(sig os.Signal) {
+	if len(h.handlers) <= 0 {
+		return
+	}
+	delete(h.handlers, sig)
+}
+
 // Touch will trigger `os/signal` manually.
 func (h *SignalHub) Touch(sig os.Signal) {
+	if sig == signaldefs.SIG_NONE {
+		log.Printf("[warn] invalid signal received")
+		return
+	}
 	h.queue <- sig
 }
 

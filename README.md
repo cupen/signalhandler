@@ -30,17 +30,11 @@ import (
 )
 
 func main() {
-	exitHook := func(sig os.Signal) {
-		// do something before process exit
+	h := signalhub.New()
+	h.Watch(syscall.SIGINT, func(sig os.Signal) {
 		countDown(10)
 		log.Printf("exited by os/signal(%v)", sig)
 		os.Exit(0)
-	}
-	h := signalhub.New()
-	h.Watch(syscall.SIGQUIT, exitHook)
-	h.Watch(syscall.SIGTERM, exitHook)
-	h.Watch(syscall.SIGINT, func(sig os.Signal) {
-		exitHook(sig)
 	})
 
 	log.Printf("started. CTRL-C or kill -INT ${pid}")
@@ -53,7 +47,6 @@ func countDown(secs int) {
 		time.Sleep(time.Second)
 	}
 }
-
 ```
 
 # License
@@ -61,7 +54,7 @@ func countDown(secs int) {
         DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE 
                     Version 2, December 2004 
 
- Copyright (C) 2020-2022 cupen <xcupen@gmail.com> 
+ Copyright (C) 2020-2023 cupen <xcupen@gmail.com> 
 
  Everyone is permitted to copy and distribute verbatim or modified 
  copies of this license document, and changing it is allowed as long 
